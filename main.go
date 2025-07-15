@@ -1,37 +1,13 @@
 package main
 
 import (
+	"go-ffmpeg/core"
+	"go-ffmpeg/binds"
 	"fmt"
-	"log"
-	"os/exec"
-	"bytes"
 )
 
-
-func runCommandWithOutput(command string) (string) {
-	out, err := exec.Command(command).Output()
-	if err != nil {
-		log.Fatal("An invalid command was executed: ", command)
-	}
-	return fmt.Sprintf("%s", out)
-}
-
-func runffmpeg(command string, params string){
-	cmd := exec.Command(command, params)
-
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-	// Redirigir el stdErr una variable para luego poder imprimirlo.
-	
-	err := cmd.Run()
-
-	if err != nil{
-		log.Fatal("Command finished with error \n", stderr.String())
-	}
-	log.Printf("Command finished succesfulyy")
-}
-
 func main(){
+	
 	/*
 		var command1 string = "date"
 	out  := runCommandWithOutput(command1)
@@ -41,9 +17,25 @@ func main(){
 	fmt.Println(out2)
 	*/
 
-	mkdirCommand := "mkdir"
-	params := "hello boiler"
-	runffmpeg(mkdirCommand, params)
-
 	
+	input_video := core.Video{Path:"assets/subway1.mp4"}
+	input_image_path := "assets/homer.jpg"
+	output_video_path := "assets/output.mp4"
+
+	cmd := "/usr/bin/ffmpeg"
+
+	// Esto sería "crear video con una sola imágen"
+	
+	/*"ffmpeg -i output.mp4 -vf subtitles=subtitles.srt mysubtitledmovie.mp4"*/	
+
+	params:= []string{
+		"-i", input_video.Path,
+		"-i", input_image_path,
+		"-filter_complex",fmt.Sprintf("[0:v][1:v] overlay=25:25:enable='between(t,0,%d)'",input_video.Length()),
+		"-pix_fmt", "yuv420p",
+		"-c:a", "copy",
+		output_video_path,
+	}
+	binds.RunCommand(cmd, params)
+
 }
