@@ -19,9 +19,9 @@ func main(){
 
 	input_video := core.Video{Path:"assets/subway1.mp4"}
 
-	_ , h_video := input_video.Resolution()
+	w_video , h_video := input_video.Resolution()
 
-	input_image_path := core.Image{Path:"assets/homer.png", PosX: 0 , PosY: uint16(float32(h_video) * 0.50)}
+	input_image_path := core.Image{Path:"assets/homer.png", PosX: 0 , PosY: uint16(float32(h_video) * 0.30)}
 	input_audio_path := core.Audio{Path: "assets/audio.mp3"}
 	input_subtitles_path := core.Subtitles{Path: "assets/subtitles.ass"}
 	output_video_path := "temp/output.mp4"
@@ -31,7 +31,7 @@ func main(){
 	params:= []string{
 		"-i", input_video.Path,
 		"-i", input_image_path.Path,
-		"-filter_complex",fmt.Sprintf("[0:v][1:v] overlay=%d:%d:enable='between(t,0,%d)'",input_image_path.PosX, input_image_path.PosY, input_video.Length()),
+		"-filter_complex",fmt.Sprintf("[1:v] scale=%d:-1 [resized]; [0:v][resized] overlay=%d:%d:enable='between(t,0,%d)'",w_video/2,input_image_path.PosX, input_image_path.PosY, input_video.Length()),
 		"-pix_fmt", "yuv420p",
 		"-c:a", "copy",
 		output_video_path,
