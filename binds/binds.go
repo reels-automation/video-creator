@@ -3,7 +3,6 @@ import (
 	"log"
 	"os/exec"
 	"bytes"
-	"fmt"
 )
 
 func RunCommand(command string, params []string){
@@ -21,10 +20,16 @@ func RunCommand(command string, params []string){
 	log.Printf("Command finished succesfulyy")
 }
 
-func RunCommandWithOutput(command string, params []string) (string) {
-	out, err := exec.Command(command, params...).Output()
+func RunCommandWithOutput(command string, params []string) string {
+	cmd := exec.Command(command, params...)
+	out, err := cmd.CombinedOutput() // captures both stdout and stderr
+
 	if err != nil {
-		log.Fatal("An invalid command was executed: ", command)
+		log.Fatalf(
+			"Command execution failed:\nCommand: %s\nArgs: %v\nError: %v\nOutput: %s",
+			command, params, err, string(out),
+		)
 	}
-	return fmt.Sprintf("%s", out)
+
+	return string(out)
 }

@@ -17,10 +17,9 @@ func main(){
 	fmt.Println(out2)
 	*/
 
-	
 	input_video := core.Video{Path:"assets/subway1.mp4"}
-	input_image_path := "assets/homer.jpg"
-	output_video_path := "assets/output.mp4"
+	input_image_path := core.Image{Path:"assets/homer.jpg", PosX: 25, PosY:200}
+	output_video_path := "temp/output.mp4"
 
 	cmd := "/usr/bin/ffmpeg"
 
@@ -30,8 +29,8 @@ func main(){
 
 	params:= []string{
 		"-i", input_video.Path,
-		"-i", input_image_path,
-		"-filter_complex",fmt.Sprintf("[0:v][1:v] overlay=25:25:enable='between(t,0,%d)'",input_video.Length()),
+		"-i", input_image_path.Path,
+		"-filter_complex",fmt.Sprintf("[0:v][1:v] overlay=%d:%d:enable='between(t,0,%d)'",input_image_path.PosX, input_image_path.PosY, 10),
 		"-pix_fmt", "yuv420p",
 		"-c:a", "copy",
 		output_video_path,
