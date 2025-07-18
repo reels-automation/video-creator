@@ -1,9 +1,9 @@
 package main
 
 import (
-	"go-ffmpeg/core"
-	"go-ffmpeg/binds"
 	"fmt"
+	"go-ffmpeg/binds"
+	"go-ffmpeg/core"
 )
 
 func main(){
@@ -19,22 +19,19 @@ func main(){
 
 	input_video := core.Video{Path:"assets/subway1.mp4"}
 
-	// video_width , video_height :=input_video.Resolution()
+	_ , h_video := input_video.Resolution()
 
-	input_image_path := core.Image{Path:"assets/homer.jpg", PosX: 0 , PosY: 0}
+	input_image_path := core.Image{Path:"assets/homer.png", PosX: 0 , PosY: uint16(float32(h_video) * 0.50)}
 	input_audio_path := core.Audio{Path: "assets/audio.mp3"}
+	input_subtitles_path := core.Subtitles{Path: "assets/subtitles.ass"}
 	output_video_path := "temp/output.mp4"
 
 	cmd := "/usr/bin/ffmpeg"
 
-	// Esto sería "crear video con una sola imágen"
-	
-	/*"ffmpeg -i output.mp4 -vf subtitles=subtitles.srt mysubtitledmovie.mp4"*/	
-
 	params:= []string{
 		"-i", input_video.Path,
 		"-i", input_image_path.Path,
-		"-filter_complex",fmt.Sprintf("[0:v][1:v] overlay=%d:%d:enable='between(t,0,%d)'",input_image_path.PosX, input_image_path.PosY, 10),
+		"-filter_complex",fmt.Sprintf("[0:v][1:v] overlay=%d:%d:enable='between(t,0,%d)'",input_image_path.PosX, input_image_path.PosY, input_video.Length()),
 		"-pix_fmt", "yuv420p",
 		"-c:a", "copy",
 		output_video_path,
@@ -51,6 +48,16 @@ func main(){
 		output_video_audio,
 	}
 	binds.RunCommand(cmd, paramsAudio)
+	
+	output_video_subtitle := "temp/output_subtitles.mp4"
+	
+	paramsSubtitle := []string{
+		"-i", output_video_audio,
+		"-vf", fmt.Sprintf("ass=%s", input_subtitles_path.Path),
+		"-c:a", "copy", 
+		output_video_subtitle,
 
+	}
+	binds.RunCommand(cmd, paramsSubtitle)
 
 }

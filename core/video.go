@@ -27,6 +27,7 @@ func (v Video) Length() uint16 {
 	}
 	return uint16(parsedOut)
 }
+
 func (v Video) Resolution() (uint16,uint16){
 	params := []string{
 		"-v", "error",

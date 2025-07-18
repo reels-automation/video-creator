@@ -1,36 +1,135 @@
 1
-00:00:00,000 --> 00:00:02,500
-Welcome to the Example Subtitle File!
+00:00:00,240 --> 00:00:00,600
+hola
 
 2
-00:00:03,000 --> 00:00:06,000
-This is a demonstration of SRT subtitles.
+00:00:00,630 --> 00:00:01,350
+soy homero
 
 3
-00:00:07,000 --> 00:00:10,500
-You can use SRT files to add subtitles to your videos.
+00:00:02,400 --> 00:00:03,270
+hoy vamos a hablar
 
 4
-00:00:12,000 --> 00:00:15,000
-Each subtitle entry consists of a number, a timecode,
-and the subtitle text.
+00:00:03,270 --> 00:00:04,620
+sobre cuál es la canción
 
 5
-00:00:16,000 --> 00:00:20,000
-The timecode format is hours:minutes:seconds,milliseconds.
+00:00:04,650 --> 00:00:06,000
+give me al dispo
 
 6
-00:00:21,000 --> 00:00:25,000
-You can adjust the timing to match your video.
+00:00:06,000 --> 00:00:06,450
+y son de maíz
 
 7
-00:00:26,000 --> 00:00:30,000
-Make sure the subtitle text is clear and readable.
+00:00:06,450 --> 00:00:07,470
+chemical romance
 
 8
-00:00:31,000 --> 00:00:35,000
-And that's how you create an SRT subtitle file!
+00:00:08,460 --> 00:00:09,600
+la banda maíz chemical
 
 9
-00:00:36,000 --> 00:00:40,000
-Enjoy adding subtitles to your videos!
+00:00:09,630 --> 00:00:10,200
+romance
+
+10
+00:00:11,250 --> 00:00:12,000
+es conocida
+
+11
+00:00:12,000 --> 00:00:13,650
+por su estilo gótico y punk
+
+12
+00:00:13,890 --> 00:00:15,630
+pero esta canción es especial
+
+13
+00:00:16,590 --> 00:00:18,210
+fue lanzada en dos mil cuatro
+
+14
+00:00:18,210 --> 00:00:20,370
+y se convirtió en un éxito instantáneo
+
+15
+00:00:21,300 --> 00:00:22,530
+gime al dispo itson
+
+16
+00:00:22,560 --> 00:00:23,220
+es una balada
+
+17
+00:00:23,220 --> 00:00:25,050
+que habla sobre la muerte de la amistad
+
+18
+00:00:25,050 --> 00:00:25,830
+y la pérdida
+
+19
+00:00:26,820 --> 00:00:28,080
+la letra es muy emotiva
+
+20
+00:00:28,080 --> 00:00:31,050
+y habla sobre cómo la presencia de alguien
+
+21
+00:00:31,050 --> 00:00:32,610
+puede ser un bóveda de veneno para nuestra felicidad
+
+22
+00:00:32,850 --> 00:00:34,440
+pero qué hace que esta canción
+
+23
+00:00:34,440 --> 00:00:35,430
+sea tan especial
+
+24
+00:00:36,360 --> 00:00:37,290
+bueno es porque
+
+25
+00:00:37,290 --> 00:00:39,150
+nos recuerda que la vida es corta
+
+26
+00:00:39,150 --> 00:00:41,010
+y que debemos aprovechar cada momento
+
+27
+00:00:41,010 --> 00:00:42,450
+con las personas que amamos
+
+28
+00:00:43,470 --> 00:00:45,600
+es como decir toma todo este veneno
+
+29
+00:00:46,560 --> 00:00:47,790
+pues que no vayas a vivir
+
+30
+00:00:47,790 --> 00:00:49,470
+sin disfrutar de lo que te rodea
+
+31
+00:00:50,430 --> 00:00:51,570
+bueno eso es todo por hoy
+
+32
+00:00:52,950 --> 00:00:54,750
+espero haberte contado algo nuevo e
+
+33
+00:00:54,750 --> 00:00:56,610
+interesante sobre esta cha unción
+
+34
+00:00:57,600 --> 00:00:58,350
+te ha gustado
