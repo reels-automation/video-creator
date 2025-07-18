@@ -8,6 +8,7 @@ import (
 )
 
 var ffprobe = "/usr/bin/ffprobe"
+
 type Video struct {
 	Path string
 }

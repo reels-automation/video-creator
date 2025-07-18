@@ -11,19 +11,19 @@
 
 ## Audio
 
-- [] Crear la estructura del Audio
-    [] Agregar audio con ffmpeg
+- [x] Crear la estructura del Audio
+    [x] Agregar audio con ffmpeg
 
 ## Imagen
 
 - [x] Crear la estructura Imágen
 - [x] Modificar su posición
-- [ ] Hacerle un Resize a las imágenes
+- [x] Hacerle un Resize a las imágenes
 
 
 ## Fixes
 
-- [] Hacer que el video termine cuando termina la duración del audio. 
+- [x] Hacer que el video termine cuando termina la duración del audio. 
 - [] 
 
 ## BuilderPattern 
