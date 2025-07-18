@@ -17,3 +17,9 @@
 
 - [] Crear la estructura Imágen
     Modificar su posición
+
+## BuilderPattern 
+
+Una estructura que permita crear un video completo en base a parametros.
+
+Pensar como pasar por pipeline los distintos videos que se van creando.

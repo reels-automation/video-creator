@@ -18,7 +18,11 @@ func main(){
 	*/
 
 	input_video := core.Video{Path:"assets/subway1.mp4"}
-	input_image_path := core.Image{Path:"assets/homer.jpg", PosX: 25, PosY:200}
+
+	// video_width , video_height :=input_video.Resolution()
+
+	input_image_path := core.Image{Path:"assets/homer.jpg", PosX: 0 , PosY: 0}
+	input_audio_path := core.Audio{Path: "assets/audio.mp3"}
 	output_video_path := "temp/output.mp4"
 
 	cmd := "/usr/bin/ffmpeg"
@@ -36,5 +40,17 @@ func main(){
 		output_video_path,
 	}
 	binds.RunCommand(cmd, params)
+
+	output_video_audio := "temp/output_audio.mp4"
+	paramsAudio := []string{
+		"-i", output_video_path,
+		"-i", input_audio_path.Path,
+		"-c", "copy",
+		"-map", "0:v:0",
+		"-map", "1:a:0",
+		output_video_audio,
+	}
+	binds.RunCommand(cmd, paramsAudio)
+
 
 }
