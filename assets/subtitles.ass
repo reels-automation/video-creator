@@ -14,37 +14,5 @@ Style: Default,Arial,15,&H0000FFFF,&H000000FF,&H00000000,&H00FFFFFF,1,0,0,0,100,
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-Dialogue: 0,0:00:00.24,0:00:00.60,Default,,0,0,0,,hola
-Dialogue: 0,0:00:00.63,0:00:01.35,Default,,0,0,0,,soy homero
-Dialogue: 0,0:00:02.40,0:00:03.27,Default,,0,0,0,,hoy vamos a hablar
-Dialogue: 0,0:00:03.27,0:00:04.62,Default,,0,0,0,,sobre cuál es la canción
-Dialogue: 0,0:00:04.65,0:00:06.00,Default,,0,0,0,,give me al dispo
-Dialogue: 0,0:00:06.00,0:00:06.45,Default,,0,0,0,,y son de maíz
-Dialogue: 0,0:00:06.45,0:00:07.47,Default,,0,0,0,,chemical romance
-Dialogue: 0,0:00:08.46,0:00:09.60,Default,,0,0,0,,la banda maíz chemical
-Dialogue: 0,0:00:09.63,0:00:10.20,Default,,0,0,0,,romance
-Dialogue: 0,0:00:11.25,0:00:12.00,Default,,0,0,0,,es conocida
-Dialogue: 0,0:00:12.00,0:00:13.65,Default,,0,0,0,,por su estilo gótico y punk
-Dialogue: 0,0:00:13.89,0:00:15.63,Default,,0,0,0,,pero esta canción es especial
-Dialogue: 0,0:00:16.59,0:00:18.21,Default,,0,0,0,,fue lanzada en dos mil cuatro
-Dialogue: 0,0:00:18.21,0:00:20.37,Default,,0,0,0,,y se convirtió en un éxito instantáneo
-Dialogue: 0,0:00:21.30,0:00:22.53,Default,,0,0,0,,gime al dispo itson
-Dialogue: 0,0:00:22.56,0:00:23.22,Default,,0,0,0,,es una balada
-Dialogue: 0,0:00:23.22,0:00:25.05,Default,,0,0,0,,que habla sobre la muerte de la amistad
-Dialogue: 0,0:00:25.05,0:00:25.83,Default,,0,0,0,,y la pérdida
-Dialogue: 0,0:00:26.82,0:00:28.08,Default,,0,0,0,,la letra es muy emotiva
-Dialogue: 0,0:00:28.08,0:00:31.05,Default,,0,0,0,,y habla sobre cómo la presencia de alguien
-Dialogue: 0,0:00:31.05,0:00:32.61,Default,,0,0,0,,puede ser un bóveda de veneno para nuestra felicidad
-Dialogue: 0,0:00:32.85,0:00:34.44,Default,,0,0,0,,pero qué hace que esta canción
-Dialogue: 0,0:00:34.44,0:00:35.43,Default,,0,0,0,,sea tan especial
-Dialogue: 0,0:00:36.36,0:00:37.29,Default,,0,0,0,,bueno es porque
-Dialogue: 0,0:00:37.29,0:00:39.15,Default,,0,0,0,,nos recuerda que la vida es corta
-Dialogue: 0,0:00:39.15,0:00:41.01,Default,,0,0,0,,y que debemos aprovechar cada momento
-Dialogue: 0,0:00:41.01,0:00:42.45,Default,,0,0,0,,con las personas que amamos
-Dialogue: 0,0:00:43.47,0:00:45.60,Default,,0,0,0,,es como decir toma todo este veneno
-Dialogue: 0,0:00:46.56,0:00:47.79,Default,,0,0,0,,pues que no vayas a vivir
-Dialogue: 0,0:00:47.79,0:00:49.47,Default,,0,0,0,,sin disfrutar de lo que te rodea
-Dialogue: 0,0:00:50.43,0:00:51.57,Default,,0,0,0,,bueno eso es todo por hoy
-Dialogue: 0,0:00:52.95,0:00:54.75,Default,,0,0,0,,espero haberte contado algo nuevo e
-Dialogue: 0,0:00:54.75,0:00:56.61,Default,,0,0,0,,interesante sobre esta cha unción
-Dialogue: 0,0:00:57.60,0:00:58.35,Default,,0,0,0,,te ha gustado
+Dialogue: 0,0:00:00.24,0:00:01.32,Default,,0,0,0,,hola soy contiene
+Dialogue: 0,0:00:01.32,0:00:01.71,Default,,0,0,0,,látex

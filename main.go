@@ -2,14 +2,51 @@ package main
 
 import (
 	"fmt"
-	"go-ffmpeg/binds"
-	"go-ffmpeg/core"
+	"os"
 	"time"
 	"log"
+	"go-ffmpeg/binds"
+	"go-ffmpeg/core"
+	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
+
 )
 
 func main(){
 	start := time.Now()
+	topic := "subtitles-audios"
+	c, err := kafka.NewConsumer(&kafka.ConfigMap{
+		"bootstrap.servers": os.Getenv("KAFKA_BROKER"),
+		"group.id":          "go-ffmpeg",
+		"auto.offset.reset": "earliest",
+	})
+
+	if err != nil{
+		panic(err)
+	}
+	
+	err = c.SubscribeTopics([]string{topic}, nil)
+
+	if err != nil {
+		panic(err)
+	}
+
+	run := true
+
+	for run {
+		msg, err := c.ReadMessage(time.Second)
+		fmt.Println("Waiting...")
+		if err == nil{
+			fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
+			
+			// Obtener gameplay video
+			// Obtener Audio 
+			// Hardcodear imagenes por nombre (por ahora)
+
+			} else if !err.(kafka.Error).IsTimeout() {
+			fmt.Printf("Consumer error: %v (%v)\n", err, msg)
+		}
+	}
+	c.Close()
 
 	input_video := core.Video{Path:"assets/undertale.mp4"}
 
@@ -45,7 +82,6 @@ func main(){
 	}
 	binds.RunCommand(cmd, params)
 
-	
 	
 	output_video_subtitle := "temp/output_subtitles.mp4"
 	
