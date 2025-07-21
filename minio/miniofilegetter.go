@@ -2,8 +2,7 @@ package minio
 
 import (
 	"context"
-	"log"
-
+	log "github.com/sirupsen/logrus"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
@@ -44,4 +43,14 @@ func (m *MinioFileGetter) GetFile(bucket string, objectName string, filePath str
 		log.Fatalf("Error trying to get: %s \n Error: %s", objectName,err)
 	}
 	return filePath
+}
+
+func (m *MinioFileGetter) UploadFile(bucket string, objectName string, filePath string) {
+	
+	info, err := m.client.FPutObject(context.Background(),bucket, objectName, filePath, minio.PutObjectOptions{})
+
+	if err != nil{
+		log.Errorf("Error trying to upload File: %s To Bucket: %s. \nError:%s", objectName,bucket,err)
+	}
+	log.Infof("Successfully uploaded %s of size %d \n", objectName, info.Size)
 }

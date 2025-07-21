@@ -26,6 +26,7 @@ func main(){
 	minioUrl := os.Getenv("PUBLIC_MINIO_URL")
 	publicMinioAccessKey := os.Getenv("PUBLIC_MINIO_ACCESS_KEY")
 	publicMinioSecretKey := os.Getenv("PUBLIC_MINIO_SECRET_KEY")
+	apiGatewayUrl := os.Getenv("API_GATEWAY_URL")
 	var useSSL bool 
 
 	if os.Getenv("USESSL") == "true"{
@@ -75,7 +76,6 @@ func main(){
 			}
 
 			fmt.Println("This is the message", m)
-			// Aca elegir el fileGetter según el que diga en el mensaje del producer.
 			os.RemoveAll("temp_assets")
 			os.Mkdir("temp_assets",0755)
 			audioDestinationPaths := m.DownloadAudio(currentFileGetter, tempFolder)
@@ -103,6 +103,10 @@ func main(){
 				Subtitles: input_subtitles_path,
 			}
 			video_builder.CreateVideo(cmd,output_video_path)
+			bucket := "videos-homero"
+			fileName := m.Tema + ".mp4"
+			video_uploader := core.VideoUploader{FileGetter: currentFileGetter}
+			video_uploader.UploadVideo(bucket,fileName,output_video_path,apiGatewayUrl, &m)
 			elapsed := time.Since(start)
 			log.Infof("Video creation took %s", elapsed)
 			
@@ -110,7 +114,6 @@ func main(){
 			log.Errorf("Consumer error: %v (%v)\n", err, msg)
 		}else {
 			log.Infof("No new message. Waiting... (%s)\n", os.Getenv("KAFKA_BROKER"))
-
 		}
 		}
 	c.Close()
