@@ -17,7 +17,7 @@ type MinioFileGetter struct{
 
 }
 
-func NewMinioFileGetter(endpoint string, accessKey string, secretKey string, useSSL bool) (*MinioFileGetter, error){
+func NewMinioFileGetter(endpoint string, accessKey string, secretKey string, useSSL bool) (*MinioFileGetter){
 	minioClient, err := minio.New(endpoint, &minio.Options{
 		Creds: credentials.NewStaticV4(accessKey, secretKey,""),
 		Secure: useSSL,
@@ -33,7 +33,7 @@ func NewMinioFileGetter(endpoint string, accessKey string, secretKey string, use
 		secretKey: secretKey,
 		useSSL: useSSL,
 		client: minioClient,
-	}, nil
+	}
 
 }
 
