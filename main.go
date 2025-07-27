@@ -15,11 +15,17 @@ import (
 )
 
 func init() {
-  log.SetOutput(os.Stdout)
-  log.SetLevel(log.InfoLevel)
+    log.SetOutput(os.Stdout)
+    log.SetLevel(log.InfoLevel)
+    log.SetFormatter(&log.TextFormatter{
+        DisableColors: true,
+        FullTimestamp: true,
+    })
+    log.Info("Starting application inside container")
 }
 
 func main(){
+	log.Info("Starting application inside container")
 	os.RemoveAll("/temp")
 	err := godotenv.Load()
 	tempFolder := "temp_assets"
@@ -42,16 +48,17 @@ func main(){
 	currentFileGetter := minio.NewMinioFileGetter(minioUrl, publicMinioAccessKey, publicMinioSecretKey,useSSL)
 
 	topic := "subtitles-audios"
-	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": os.Getenv("KAFKA_BROKER"),
-		"group.id":"go-ffmpeg",
-		"auto.offset.reset": "earliest",
-	})
-
-	if err != nil{
-		log.Fatal(err)
-	}
 	
+	c, err := kafka.NewConsumer(&kafka.ConfigMap{
+    "bootstrap.servers": os.Getenv("KAFKA_BROKER"),
+    "group.id": "go-ffmpeg",
+    "auto.offset.reset": "earliest",
+	})
+	if err != nil {
+		log.Fatalf("Failed to create consumer: %v", err)
+	}
+	defer c.Close()
+		
 	err = c.SubscribeTopics([]string{topic}, nil)
 
 	if err != nil {

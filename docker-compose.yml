@@ -1,0 +1,21 @@
+services:
+  video-creator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: video-creator
+    environment:
+      KAFKA_BROKER: ${KAFKA_BROKER}
+      PUBLIC_MINIO_URL: ${PUBLIC_MINIO_URL}
+      PUBLIC_MINIO_ACCESS_KEY: ${PUBLIC_MINIO_ACCESS_KEY}
+      PUBLIC_MINIO_SECRET_KEY: ${PUBLIC_MINIO_SECRET_KEY}
+      API_GATEWAY_URL: ${API_GATEWAY_URL}
+      USESSL: ${USESSL}
+    networks:
+        - local-kafka
+    ports:
+      - "8080:8080"
+   
+networks:
+  local-kafka:
+    external: true
