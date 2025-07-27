@@ -36,7 +36,7 @@ func (n NormalVideoBuilder) CreateVideo(cmd string, outputFile string){
 				"-map", "[v]",
 				"-map", "1:a:0",
 				"-c:v", "libx264",
-				"-c:a", "copy",
+				"-c:a", "aac",
 				"-pix_fmt", "yuv420p",
 				"-shortest",
 				outputFile,
