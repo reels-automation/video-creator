@@ -13,7 +13,16 @@ services:
       USESSL: ${USESSL}
     networks:
         - local-kafka
+        - minio-admin-files
+        - minio-network
+        - api-gateway
    
 networks:
   local-kafka:
+    external: true
+  minio-admin-files:
+    external: true
+  minio-network:
+    external: true
+  api-gateway:
     external: true
