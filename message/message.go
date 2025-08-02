@@ -2,6 +2,12 @@ package message
 
 import (
 	"go-ffmpeg/minio"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
 )
 
 type AudioItem struct {
@@ -92,4 +98,58 @@ func (m Message) DownloadAssets(fileGetter minio.FileGetter, destinationFolder s
 	m.DownloadAudio(fileGetter,destinationFolder)
 	m.DownloadSubtitles(fileGetter,destinationFolder)
 	m.DownloadGameplay(fileGetter, destinationFolder)
+}
+
+type randomImageResponse struct {
+	ObjectName string `json:"object_name"`
+	ObjectURL  string `json:"object_url"`
+}
+
+// Descarga una imagen aleatoria desde el API Gateway, usando HTTP puro
+func (m *Message) DownloadRandomImage(destinationFolder string, adminApi string) (string, error) {
+	personaje := m.Personaje
+	endpoint := fmt.Sprintf("%s/random-image/%s", adminApi, personaje)
+
+	resp, err := http.Get(endpoint)
+	if err != nil {
+		return "", fmt.Errorf("error en la petición al API: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("API respondió con error (%d): %s", resp.StatusCode, string(body))
+	}
+
+	var imageResp randomImageResponse
+	if err := json.NewDecoder(resp.Body).Decode(&imageResp); err != nil {
+		return "", fmt.Errorf("error parseando JSON del API: %w", err)
+	}
+
+	// Descargar la imagen desde la URL pública del MinIO
+	imageRespHttp, err := http.Get(imageResp.ObjectURL)
+	if err != nil {
+		return "", fmt.Errorf("error descargando imagen desde MinIO (URL): %w", err)
+	}
+	defer imageRespHttp.Body.Close()
+
+	if imageRespHttp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("fallo al descargar imagen (status %d)", imageRespHttp.StatusCode)
+	}
+
+	// Crear archivo local
+	localPath := filepath.Join(destinationFolder, imageResp.ObjectName)
+	outFile, err := os.Create(localPath)
+	if err != nil {
+		return "", fmt.Errorf("error creando archivo local: %w", err)
+	}
+	defer outFile.Close()
+
+	// Copiar el contenido de la imagen al archivo
+	_, err = io.Copy(outFile, imageRespHttp.Body)
+	if err != nil {
+		return "", fmt.Errorf("error guardando imagen localmente: %w", err)
+	}
+
+	return localPath, nil
 }

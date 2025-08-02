@@ -33,6 +33,7 @@ func main(){
 	publicMinioAccessKey := os.Getenv("PUBLIC_MINIO_ACCESS_KEY")
 	publicMinioSecretKey := os.Getenv("PUBLIC_MINIO_SECRET_KEY")
 	apiGatewayUrl := os.Getenv("API_GATEWAY_URL")
+	adminApi := os.Getenv("ADMIN_API")
 	var useSSL bool 
 
 	if os.Getenv("USESSL") == "true"{
@@ -97,7 +98,18 @@ func main(){
 
 			_ , h_video := input_video.Resolution()
 
-			input_image_path := core.Image{Path:"assets/homer.png", PosX: 0 , PosY: uint16(float32(h_video) * 0.30)}
+			imagePath, err := m.DownloadRandomImage(tempFolder, adminApi)
+			if err != nil {
+				log.Errorf("Error obteniendo imagen aleatoria: %v", err)
+				imagePath = "assets/404.png"
+			}
+
+			input_image_path := core.Image{
+				Path: imagePath,
+				PosX: 0,
+				PosY: uint16(float32(h_video) * 0.30),
+			}
+
 			input_audio_path := core.Audio{Path: audioDestinationPaths[0]}
 			input_subtitles_path := core.Subtitles{Path: subtitleDestinationPaths[0]}
 			output_video_path := "temp/output.mp4"
