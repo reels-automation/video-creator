@@ -47,7 +47,7 @@ func main(){
 	}
 
 	currentFileGetter := minio.NewMinioFileGetter(minioUrl, publicMinioAccessKey, publicMinioSecretKey,useSSL)
-
+	log.Infof("Connecting to MinIO at %s (useSSL=%v)", minioUrl, useSSL)
 	topic := "subtitles-audios"
 	
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
