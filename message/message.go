@@ -57,6 +57,7 @@ type Message struct {
 	RandomImages        bool             `json:"random_images"`
 	RandomAmountImages  int               `json:"random_amount_images"`
 	GptModel            string            `json:"gpt_model"`
+	Status              string            `json:"status"`
 }
 
 func (m Message) DownloadAudio(fileGetter minio.FileGetter, destinationFolder string) []string{
@@ -105,7 +106,6 @@ type randomImageResponse struct {
 	ObjectURL  string `json:"object_url"`
 }
 
-// Descarga una imagen aleatoria desde el API Gateway, usando HTTP puro
 func (m *Message) DownloadRandomImage(destinationFolder string, adminApi string) (string, error) {
 	personaje := m.Personaje
 	endpoint := fmt.Sprintf("%s/random-image/%s", adminApi, personaje)
@@ -126,7 +126,6 @@ func (m *Message) DownloadRandomImage(destinationFolder string, adminApi string)
 		return "", fmt.Errorf("error parseando JSON del API: %w", err)
 	}
 
-	// Descargar la imagen desde la URL pública del MinIO
 	imageRespHttp, err := http.Get(imageResp.ObjectURL)
 	if err != nil {
 		return "", fmt.Errorf("error descargando imagen desde MinIO (URL): %w", err)
@@ -137,7 +136,6 @@ func (m *Message) DownloadRandomImage(destinationFolder string, adminApi string)
 		return "", fmt.Errorf("fallo al descargar imagen (status %d)", imageRespHttp.StatusCode)
 	}
 
-	// Crear archivo local
 	localPath := filepath.Join(destinationFolder, imageResp.ObjectName)
 	outFile, err := os.Create(localPath)
 	if err != nil {
@@ -145,7 +143,6 @@ func (m *Message) DownloadRandomImage(destinationFolder string, adminApi string)
 	}
 	defer outFile.Close()
 
-	// Copiar el contenido de la imagen al archivo
 	_, err = io.Copy(outFile, imageRespHttp.Body)
 	if err != nil {
 		return "", fmt.Errorf("error guardando imagen localmente: %w", err)
