@@ -7,6 +7,7 @@ import (
 	"go-ffmpeg/minio"
 	"go-ffmpeg/message"
 	"net/http"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -65,6 +66,8 @@ func PostEndpoint(apiGatewayUrl string, videoName string, message *message.Messa
 	}
 
 	dataMap["url"] = urlResp.Url
+	// Add current date/time for when the video record is created
+	dataMap["date"] = time.Now().UTC().Format(time.RFC3339)
 
 	dataBytes, err := json.Marshal(dataMap)
 	if err != nil {
