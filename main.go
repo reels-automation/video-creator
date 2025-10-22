@@ -121,6 +121,9 @@ func main(){
 				Image: input_image_path,
 				Subtitles: input_subtitles_path,
 			}
+
+			// TODO acá hay que agregar poner el estado del video como "IN PROGRESS"
+
 			video_builder.CreateVideo(cmd,output_video_path)
 			bucket := "videos-homero"
 			fileName := m.Tema + ".mp4"
