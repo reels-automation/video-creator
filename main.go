@@ -8,132 +8,192 @@ import (
 	"go-ffmpeg/minio"
 	"os"
 	"regexp"
-	log "github.com/sirupsen/logrus"
+	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/joho/godotenv"
 )
 
 func init() {
-    log.SetOutput(os.Stdout)
-    log.SetLevel(log.InfoLevel)
-    log.SetFormatter(&log.TextFormatter{
-        DisableColors: true,
-        FullTimestamp: true,
-    })
-    log.Info("Starting application inside container")
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.DebugLevel) // full verbosity for debugging
+	log.SetFormatter(&log.TextFormatter{
+		DisableColors: false,
+		FullTimestamp: true,
+		TimestampFormat: "2006-01-02 15:04:05",
+	})
+	log.Info("🔧 Starting application initialization")
 }
 
-func main(){
-	log.Info("Starting application inside container")
+func LoadEnv() {
+	// Try loading .env only if it exists
+	if _, err := os.Stat(".env"); err == nil {
+		if err := godotenv.Load(); err != nil {
+			log.Warnf("⚠️  Could not load .env file: %v", err)
+		} else {
+			log.Info("✅ .env file successfully loaded")
+		}
+	} else {
+		log.Info("ℹ️  No .env file found — using Docker or system environment variables")
+	}
+
+	// Dump environment variables for debugging
+	log.Debug("========= 🔍 ENVIRONMENT VARIABLES (BEGIN) =========")
+
+	envKeys := []string{
+		"ENVIRONMENT",
+		"LOG_LEVEL",
+		"DEBUG_MODE",
+		"PUBLIC_MINIO_URL",
+		"PUBLIC_MINIO_ACCESS_KEY",
+		"PUBLIC_MINIO_SECRET_KEY",
+		"API_GATEWAY_URL",
+		"ADMIN_API",
+		"ADMIN_API_NO_BACKSLASH",
+		"KAFKA_URL",
+		"KAFKA_BROKER",
+		"OLLAMA_IP",
+		"OLLAMA_IP_API",
+		"MONGO_URL",
+		"TTS_RVC_IMAGE",
+		"USESSL",
+		"SECURE",
+		"JWT_KEY",
+	}
+
+	for _, key := range envKeys {
+		val := os.Getenv(key)
+		if val == "" {
+			log.Warnf("🚨 %s is not set!", key)
+		} else {
+			// Mask sensitive keys
+			if strings.Contains(strings.ToLower(key), "key") || strings.Contains(strings.ToLower(key), "secret") {
+				log.Debugf("%s = *****", key)
+			} else {
+				log.Debugf("%s = %s", key, val)
+			}
+		}
+	}
+
+	log.Debug("========= 🔍 ENVIRONMENT VARIABLES (END) =========")
+
+	// Example check for USESSL
+	useSSL := strings.ToLower(os.Getenv("USESSL")) == "true"
+	log.Infof("🔐 USESSL = %v", useSSL)
+}
+
+func main() {
+	log.Info("🚀 Starting main application")
+	LoadEnv()
+
+	// Remove old temp folders
 	os.RemoveAll("/temp")
-	err := godotenv.Load()
-	tempFolder := "temp_assets"
+	os.RemoveAll("temp_assets")
+	os.Mkdir("temp_assets", 0755)
+
+	// Retrieve environment variables
 	minioUrl := os.Getenv("PUBLIC_MINIO_URL")
 	publicMinioAccessKey := os.Getenv("PUBLIC_MINIO_ACCESS_KEY")
 	publicMinioSecretKey := os.Getenv("PUBLIC_MINIO_SECRET_KEY")
 	apiGatewayUrl := os.Getenv("API_GATEWAY_URL")
 	adminApi := os.Getenv("ADMIN_API")
-	var useSSL bool 
+	kafkaBroker := os.Getenv("KAFKA_BROKER")
 
-	if os.Getenv("USESSL") == "true"{
-		useSSL = true
-	}else{
-		useSSL = false
-	}
-		
-	if err != nil {
-		log.Errorf("Error loading .env file: %v", err)
-	}
+	useSSL := strings.ToLower(os.Getenv("USESSL")) == "true"
+	log.Infof("🔗 Connecting to MinIO at %s (useSSL=%v)", minioUrl, useSSL)
 
-	currentFileGetter := minio.NewMinioFileGetter(minioUrl, publicMinioAccessKey, publicMinioSecretKey,useSSL)
-	log.Infof("Connecting to MinIO at %s (useSSL=%v)", minioUrl, useSSL)
+	currentFileGetter := minio.NewMinioFileGetter(minioUrl, publicMinioAccessKey, publicMinioSecretKey, useSSL)
 	topic := "subtitles-audios"
-	
+
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-    "bootstrap.servers": os.Getenv("KAFKA_BROKER"),
-    "group.id": "go-ffmpeg",
-    "auto.offset.reset": "earliest",
+		"bootstrap.servers": kafkaBroker,
+		"group.id":          "go-ffmpeg",
+		"auto.offset.reset": "earliest",
 	})
 	if err != nil {
-		log.Fatalf("Failed to create consumer: %v", err)
+		log.Fatalf("❌ Failed to create Kafka consumer: %v", err)
 	}
 	defer c.Close()
-		
-	err = c.SubscribeTopics([]string{topic}, nil)
 
-	if err != nil {
-		log.Fatal(err)
+	if err := c.SubscribeTopics([]string{topic}, nil); err != nil {
+		log.Fatalf("❌ Failed to subscribe to topic: %v", err)
 	}
+	log.Infof("✅ Subscribed to Kafka topic: %s", topic)
 
-	run := true
-	for run {
-
-		msg, err := c.ReadMessage(time.Second*5)
-		if err == nil{
-			fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
+	for {
+		msg, err := c.ReadMessage(time.Second * 5)
+		if err == nil {
+			log.Infof("📩 Message on %s: %s", msg.TopicPartition, string(msg.Value))
 			
 			var m message.Message
-
 			re := regexp.MustCompile(`'([^']*?)'`)
 			fixedJSON := re.ReplaceAllString(string(msg.Value), `"$1"`)
-
-			err = json.Unmarshal([]byte(fixedJSON), &m)
-			if err != nil {
-				log.Errorf("Error parsing message JSON: %s", err)
+			
+			if err := json.Unmarshal([]byte(fixedJSON), &m); err != nil {
+				log.Errorf("❌ Error parsing message JSON: %s", err)
+				continue
 			}
 
-			fmt.Println("This is the message", m)
-			os.RemoveAll("temp_assets")
-			os.Mkdir("temp_assets",0755)
-			audioDestinationPaths := m.DownloadAudio(currentFileGetter, tempFolder)
-			subtitleDestinationPaths := m.DownloadSubtitles(currentFileGetter,tempFolder)
-			gameplayDestinationPath := m.DownloadGameplay(currentFileGetter, tempFolder)
-			
-			// Video Creation
+			log.Infof("📦 Parsed message: %+v", m)
+
+			audioPaths := m.DownloadAudio(currentFileGetter, "temp_assets")
+			subPaths := m.DownloadSubtitles(currentFileGetter, "temp_assets")
+			gameplayPath := m.DownloadGameplay(currentFileGetter, "temp_assets")
+
+			log.Debugf("🎵 Audio paths: %v", audioPaths)
+			log.Debugf("💬 Subtitle paths: %v", subPaths)
+			log.Debugf("🎮 Gameplay path: %s", gameplayPath)
+
 			os.RemoveAll("temp")
-			os.Mkdir("temp",0755)
+			os.Mkdir("temp", 0755)
+
 			start := time.Now()
-			input_video := core.Video{Path:gameplayDestinationPath}
+			inputVideo := core.Video{Path: gameplayPath}
+			_, hVideo := inputVideo.Resolution()
 
-			_ , h_video := input_video.Resolution()
-
-			imagePath, err := m.DownloadRandomImage(tempFolder, adminApi)
+			imagePath, err := m.DownloadRandomImage("temp_assets", adminApi)
 			if err != nil {
-				log.Errorf("Error obteniendo imagen aleatoria: %v", err)
+				log.Errorf("⚠️  Error obtaining random image: %v", err)
 				imagePath = "assets/404.png"
 			}
 
-			input_image_path := core.Image{
+			inputImage := core.Image{
 				Path: imagePath,
 				PosX: 0,
-				PosY: uint16(float32(h_video) * 0.30),
+				PosY: uint16(float32(hVideo) * 0.30),
 			}
 
-			input_audio_path := core.Audio{Path: audioDestinationPaths[0]}
-			input_subtitles_path := core.Subtitles{Path: subtitleDestinationPaths[0]}
-			output_video_path := "temp/output.mp4"
+			inputAudio := core.Audio{Path: audioPaths[0]}
+			inputSubs := core.Subtitles{Path: subPaths[0]}
+			outputVideo := "temp/output.mp4"
 			cmd := "/usr/bin/ffmpeg"
 
-			video_builder := core.NormalVideoBuilder{
-				Video: input_video,
-				Audio: input_audio_path,
-				Image: input_image_path,
-				Subtitles: input_subtitles_path,
+			videoBuilder := core.NormalVideoBuilder{
+				Video:     inputVideo,
+				Audio:     inputAudio,
+				Image:     inputImage,
+				Subtitles: inputSubs,
 			}
-			video_builder.CreateVideo(cmd,output_video_path)
+
+			log.Infof("🎬 Starting FFmpeg video creation...")
+			videoBuilder.CreateVideo(cmd, outputVideo)
+
 			bucket := "videos-homero"
-			fileName := m.Tema + ".mp4"
-			video_uploader := core.VideoUploader{FileGetter: currentFileGetter}
-			video_uploader.UploadVideo(bucket,fileName,output_video_path,apiGatewayUrl, &m)
+			fileName := fmt.Sprintf("%s.mp4", m.Tema)
+			videoUploader := core.VideoUploader{FileGetter: currentFileGetter}
+
+			log.Infof("⬆️  Uploading video %s to bucket %s", fileName, bucket)
+			videoUploader.UploadVideo(bucket, fileName, outputVideo, apiGatewayUrl, &m)
+
 			elapsed := time.Since(start)
-			log.Infof("Video creation took %s", elapsed)
-			
-		}else if !err.(kafka.Error).IsTimeout() {
-			log.Errorf("Consumer error: %v (%v)\n", err, msg)
-		}else {
-			log.Infof("No new message. Waiting... (%s)\n", os.Getenv("KAFKA_BROKER"))
+			log.Infof("✅ Video creation took %s", elapsed)
+
+		} else if kafkaErr, ok := err.(kafka.Error); ok && !kafkaErr.IsTimeout() {
+			log.Errorf("❌ Kafka consumer error: %v", kafkaErr)
+		} else {
+			log.Debugf("⌛ No new message. Waiting... (%s)", kafkaBroker)
 		}
-		}
-	c.Close()
+	}
 }
