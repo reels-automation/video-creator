@@ -137,6 +137,6 @@ func main(){
 		}else {
 			log.Infof("No new message. Waiting... (%s)\n", os.Getenv("KAFKA_BROKER"))
 		}
-		}
+	}
 	c.Close()
 }
